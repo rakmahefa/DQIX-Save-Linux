@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DQ9.Avalonia.ViewModels.Screens"
+             x:Class="DQ9.Avalonia.Views.Screens.MonstersScreen"
+             x:DataType="vm:MonstersScreenViewModel">
+  <Grid ColumnDefinitions="280,*" RowDefinitions="Auto,*" Margin="8">
+    <!-- UX-16: the bulk tool is labelled and confirms before overwriting. -->
+    <StackPanel Grid.Column="0" Grid.Row="0" Margin="0,0,0,6">
+      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}">
+        <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding LumpValue}"
+                 ToolTip.Tip="Value written to every monster's victory count." />
+        <Button Content="Apply to all victories" Click="OnLump"
+                ToolTip.Tip="Overwrites the victory count of ALL monsters with the value on the left (undoable via Ctrl+Z)." />
+      </StackPanel>
+      <Button Content="Recount completion" Margin="0,4,0,0" HorizontalAlignment="Left" Click="OnRevise"
+              ToolTip.Tip="Recounts the monster encyclopedia completion." />
+    </StackPanel>
+    <ListBox Grid.Column="0" Grid.Row="1" ItemsSource="{Binding Monsters}" SelectedItem="{Binding SelectedMonster}">
+      <ListBox.ItemTemplate>
+        <DataTemplate><TextBlock Text="{Binding Display}" /></DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <Border Grid.Column="1" Grid.Row="1" Classes="card"
+            VerticalAlignment="Top" HorizontalAlignment="Stretch" MaxWidth="560">
+      <StackPanel>
+        <TextBlock Classes="group">Selected monster</TextBlock>
+        <TextBlock Classes="readout" Text="{Binding SelectedMonster.Name}" />
+        <TextBlock Classes="lbl">Victories</TextBlock>
+        <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding Victory}" />
+        <TextBlock Classes="lbl">Drop 1 count</TextBlock>
+        <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding ItemCount1}" />
+        <TextBlock Classes="lbl">Drop 2 count</TextBlock>
+        <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding ItemCount2}" />
+        <TextBlock Classes="readout" Text="{Binding CompCount, StringFormat='Completion: {0}'}" />
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>

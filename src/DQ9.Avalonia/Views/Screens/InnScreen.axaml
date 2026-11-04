@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DQ9.Avalonia.ViewModels.Screens"
+             x:Class="DQ9.Avalonia.Views.Screens.InnScreen"
+             x:DataType="vm:InnScreenViewModel">
+  <!-- UX-06: three rows — the summary previously drew on top of the list. -->
+  <Grid ColumnDefinitions="280,*" RowDefinitions="Auto,*,Auto" Margin="8">
+    <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}">
+      <Button Content="Up" Click="OnUp" ToolTip.Tip="Move the selected guest up." />
+      <Button Content="Down" Click="OnDown" ToolTip.Tip="Move the selected guest down." />
+      <Button Content="Create" Click="OnCreate" ToolTip.Tip="Add a new guest in the first free slot." />
+      <!-- UX-16: destructive action stands apart and asks first. -->
+      <Button Content="Delete" Classes="danger" Click="OnDelete" Margin="8,0,0,0"
+              ToolTip.Tip="Remove the selected guest (asks for confirmation)." />
+    </StackPanel>
+    <ListBox Grid.Column="0" Grid.Row="1" ItemsSource="{Binding Visitors}" SelectedItem="{Binding SelectedVisitor}">
+      <ListBox.ItemTemplate>
+        <DataTemplate><TextBlock Text="{Binding Display}" /></DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <StackPanel Grid.Column="0" Grid.Row="2" Margin="0,6,0,0">
+      <TextBlock Classes="readout" Text="{Binding Grade, StringFormat='Rikka grade: {0}'}" />
+      <TextBlock Classes="readout" Text="{Binding Uid, StringFormat='UID: {0}'}" />
+      <TextBlock Classes="readout" Text="{Binding VisitorCount, StringFormat='Visitors: {0}'}" />
+    </StackPanel>
+    <Border Grid.Column="1" Grid.Row="0" Grid.RowSpan="3" Classes="card"
+            VerticalAlignment="Top" HorizontalAlignment="Stretch" MaxWidth="560">
+      <StackPanel>
+        <TextBlock Classes="group">Guest</TextBlock>
+        <TextBlock Classes="lbl">Name</TextBlock>
+        <TextBox Width="{DynamicResource FieldMediumWidth}" Text="{Binding Name}"
+                 ToolTip.Tip="Guest name — unreadable characters are bytes that do not map to game text." />
+        <TextBlock Classes="lbl">Level</TextBlock>
+        <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding Level}" />
+        <TextBlock Classes="lbl">Job</TextBlock>
+        <ComboBox Width="{DynamicResource FieldMediumWidth}" ItemsSource="{Binding Jobs}" SelectedItem="{Binding SelectedJob}" />
+        <TextBlock Classes="lbl">Place</TextBlock>
+        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}">
+          <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding Place}"
+                   ToolTip.Tip="Home-place index (0–255) as stored in the save." />
+        </StackPanel>
+        <CheckBox Content="Has a treasure map" IsChecked="{Binding HaveTreasureMap}" Margin="0,6,0,0" />
+        <TextBlock Classes="lbl">Lodging (Y/M/D)</TextBlock>
+        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}">
+          <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding LodgingYear}" />
+          <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding LodgingMonth}" />
+          <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding LodgingDay}" />
+        </StackPanel>
+        <TextBlock Classes="lbl">Completion rate (0–127)</TextBlock>
+        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapMedium}">
+          <StackPanel>
+            <TextBlock Text="Monster" Classes="sublbl" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding MonsterCompRate}" />
+          </StackPanel>
+          <StackPanel>
+            <TextBlock Text="Item" Classes="sublbl" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding ItemCompRate}" />
+          </StackPanel>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapMedium}">
+          <StackPanel>
+            <TextBlock Text="Fashion" Classes="sublbl" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding FashionCompRate}" />
+          </StackPanel>
+          <StackPanel>
+            <TextBlock Text="Alchemy" Classes="sublbl" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding AlchemyCompRate}" />
+          </StackPanel>
+        </StackPanel>
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>

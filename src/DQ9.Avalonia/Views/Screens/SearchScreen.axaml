@@ -1,0 +1,104 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DQ9.Avalonia.ViewModels.Screens"
+             x:Class="DQ9.Avalonia.Views.Screens.SearchScreen"
+             x:DataType="vm:SearchScreenViewModel">
+  <Grid ColumnDefinitions="380,*" Margin="8">
+    <ScrollViewer Grid.Column="0">
+      <StackPanel>
+        <Border Classes="card">
+          <StackPanel>
+            <TextBlock Classes="group">Search cache</TextBlock>
+            <!-- UX-18: file name only; the full path lives in the tooltip. -->
+            <TextBlock Classes="hint" Text="{Binding CacheFileName}" ToolTip.Tip="{Binding CachePath}" />
+            <TextBlock Text="{Binding Status}" TextWrapping="Wrap" MaxWidth="340" />
+            <ProgressBar Value="{Binding ProgressPercent}" Maximum="100" Height="6" Margin="0,4,0,0"
+                         IsVisible="{Binding IsBusy}" />
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}" Margin="0,6,0,0">
+              <Button Content="Generate cache" Click="OnGenerate" IsEnabled="{Binding IsNotBusy}"
+                      ToolTip.Tip="Walks every seed/rank once and stores the dungeon list (~1 min, cancelable)." />
+              <Button Content="Cancel" Click="OnCancel" IsEnabled="{Binding CanCancel}" />
+              <Button Content="Reload cache" Click="OnReload" IsEnabled="{Binding IsNotBusy}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <Border Classes="card">
+          <StackPanel>
+            <TextBlock Classes="group">Conditions</TextBlock>
+            <TextBlock Classes="lbl">Comparison</TextBlock>
+            <ComboBox Width="{DynamicResource FieldMediumWidth}" ItemsSource="{Binding ConditionTypeOptions}"
+                      SelectedItem="{Binding SelectedConditionTypeOption}"
+                      ToolTip.Tip="How each active condition compares against the dungeon.">
+              <ComboBox.ItemTemplate>
+                <DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <!-- UX-18: inactive filters are visibly disabled, not silently ignored. -->
+            <CheckBox Content="Name part 1" IsChecked="{Binding UseName1}" />
+            <ComboBox Width="{DynamicResource FieldMediumWidth}" ItemsSource="{Binding Name1Options}"
+                      SelectedIndex="{Binding Name1Index}" IsEnabled="{Binding UseName1}" />
+            <CheckBox Content="Name part 2" IsChecked="{Binding UseName2}" />
+            <ComboBox Width="{DynamicResource FieldMediumWidth}" ItemsSource="{Binding Name2Options}"
+                      SelectedIndex="{Binding Name2Index}" IsEnabled="{Binding UseName2}" />
+            <CheckBox Content="Name part 3" IsChecked="{Binding UseName3}" />
+            <ComboBox Width="{DynamicResource FieldMediumWidth}" ItemsSource="{Binding Name3Options}"
+                      SelectedIndex="{Binding Name3Index}" IsEnabled="{Binding UseName3}" />
+            <CheckBox Content="Boss" IsChecked="{Binding UseBoss}" />
+            <ComboBox Width="{DynamicResource FieldMediumWidth}" ItemsSource="{Binding BossOptions}"
+                      SelectedIndex="{Binding BossIndex}" IsEnabled="{Binding UseBoss}" />
+            <CheckBox Content="Map type" IsChecked="{Binding UseMapType}" />
+            <ComboBox Width="{DynamicResource FieldMediumWidth}" ItemsSource="{Binding MapTypes}"
+                      SelectedIndex="{Binding MapTypeValue}" IsEnabled="{Binding UseMapType}" />
+            <CheckBox Content="Map level" IsChecked="{Binding UseMapLevel}" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding MapLevel}" IsEnabled="{Binding UseMapLevel}" />
+            <CheckBox Content="Monster rank" IsChecked="{Binding UseMonsterRank}" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding MonsterRank}" IsEnabled="{Binding UseMonsterRank}" />
+            <CheckBox Content="Floor count" IsChecked="{Binding UseFloorCount}" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding FloorCount}" IsEnabled="{Binding UseFloorCount}" />
+            <CheckBox Content="Chests (0 = count, 1–9 = rank)" IsChecked="{Binding UseBox}" />
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}">
+              <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding BoxType}" IsEnabled="{Binding UseBox}" />
+              <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding BoxCount}" IsEnabled="{Binding UseBox}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <Border Classes="card">
+          <StackPanel>
+            <TextBlock Classes="group">Results</TextBlock>
+            <TextBlock Classes="lbl">Sort</TextBlock>
+            <ComboBox Width="{DynamicResource FieldMediumWidth}" ItemsSource="{Binding SortOptions}"
+                      SelectedItem="{Binding SelectedSortOption}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapMedium}" Margin="0,6,0,0">
+              <Button Content="Search" Click="OnSearch" IsEnabled="{Binding IsNotBusy}" />
+              <TextBlock VerticalAlignment="Center" Classes="readout" Text="{Binding ResultCount}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+    <Grid Grid.Column="1" RowDefinitions="*,Auto" Margin="4,0,0,0">
+      <Panel Grid.Row="0">
+        <ListBox ItemsSource="{Binding Results}" SelectedItem="{Binding SelectedResult}">
+          <ListBox.ItemTemplate>
+            <DataTemplate><TextBlock Text="{Binding Display}" /></DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+        <!-- UX-18: the results pane states itself instead of reading as a broken box. -->
+        <Panel IsVisible="{Binding !HasResults}">
+          <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                  Padding="16,10" CornerRadius="6"
+                  BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1">
+            <TextBlock Classes="hint" MaxWidth="320" TextWrapping="Wrap"
+                       Text="0 results — run Search after generating the cache. Tick at least one condition to narrow the list." />
+          </Border>
+        </Panel>
+      </Panel>
+      <TextBlock Grid.Row="1" Text="{Binding ResultDetails}" TextWrapping="Wrap" Margin="0,6,0,0" />
+    </Grid>
+  </Grid>
+</UserControl>

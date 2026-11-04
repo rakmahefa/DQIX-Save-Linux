@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DQ9.Avalonia.ViewModels.Screens"
+             x:Class="DQ9.Avalonia.Views.Screens.CollectionsScreen"
+             x:DataType="vm:CollectionsScreenViewModel">
+  <Grid ColumnDefinitions="*,*,*" Margin="8">
+    <Border Grid.Column="0" Classes="card" Margin="0,0,4,0">
+      <DockPanel>
+        <TextBlock DockPanel.Dock="Top" Classes="group">Alchemy recipes</TextBlock>
+        <StackPanel DockPanel.Dock="Bottom">
+          <TextBlock Classes="readout" Text="{Binding AlchemyCompCount, StringFormat='Completion: {0}'}" />
+          <ComboBox Width="{DynamicResource FieldMediumWidth}" ItemsSource="{Binding AlchemyStateOptions}"
+                    SelectedItem="{Binding SelectedAlchemyStateOption}" Margin="0,4,0,0">
+            <ComboBox.ItemTemplate>
+              <DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+        </StackPanel>
+        <ListBox ItemsSource="{Binding Alchemy}" SelectedItem="{Binding SelectedAlchemy}">
+          <ListBox.ItemTemplate>
+            <DataTemplate><TextBlock Text="{Binding Display}" /></DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </DockPanel>
+    </Border>
+    <Border Grid.Column="1" Classes="card" Margin="4,0">
+      <DockPanel>
+        <TextBlock DockPanel.Dock="Top" Classes="group">Item collection</TextBlock>
+        <StackPanel DockPanel.Dock="Bottom">
+          <TextBlock Classes="readout" Text="{Binding CollectionCompCount, StringFormat='Completion: {0}'}" />
+          <Button Content="Revise" Margin="0,4,0,0" HorizontalAlignment="Left" Click="OnReviseCollection"
+                  ToolTip.Tip="Recounts every held collection item and writes the total." />
+        </StackPanel>
+        <ListBox ItemsSource="{Binding Collection}">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked}" />
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </DockPanel>
+    </Border>
+    <Border Grid.Column="2" Classes="card" Margin="4,0,0,0">
+      <DockPanel>
+        <TextBlock DockPanel.Dock="Top" Classes="group">Smart items (DQVC)</TextBlock>
+        <StackPanel DockPanel.Dock="Bottom">
+          <TextBlock Classes="readout" Text="{Binding SmartCompCount, StringFormat='Completion: {0}'}" />
+          <Button Content="Revise" Margin="0,4,0,0" HorizontalAlignment="Left" Click="OnReviseSmart"
+                  ToolTip.Tip="Recounts every held smart item and writes the total." />
+        </StackPanel>
+        <ListBox ItemsSource="{Binding SmartItems}">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked}" />
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </DockPanel>
+    </Border>
+  </Grid>
+</UserControl>

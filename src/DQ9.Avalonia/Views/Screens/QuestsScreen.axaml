@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DQ9.Avalonia.ViewModels.Screens"
+             x:Class="DQ9.Avalonia.Views.Screens.QuestsScreen"
+             x:DataType="vm:QuestsScreenViewModel">
+  <Grid ColumnDefinitions="300,*" Margin="8">
+    <ListBox Grid.Column="0" ItemsSource="{Binding Quests}" SelectedItem="{Binding SelectedQuest}">
+      <ListBox.ItemTemplate>
+        <DataTemplate><TextBlock Text="{Binding Display}" /></DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <ScrollViewer Grid.Column="1">
+      <WrapPanel>
+        <Border Classes="card">
+          <StackPanel>
+            <TextBlock Classes="group">State</TextBlock>
+            <ComboBox Width="{DynamicResource FieldMediumWidth}" ItemsSource="{Binding StateOptions}"
+                      SelectedItem="{Binding SelectedStateOption}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <TextBlock Classes="lbl">Date (Y/M/D H:M)</TextBlock>
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}">
+              <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding Year}" />
+              <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding Month}" />
+              <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding Day}" />
+              <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding Hour}" />
+              <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding Minute}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <Border Classes="card">
+          <StackPanel>
+            <TextBlock Classes="group">Counters</TextBlock>
+            <TextBlock Classes="readout" Text="{Binding ClearCount, StringFormat='Cleared: {0}'}" />
+            <TextBlock Classes="readout" Text="{Binding OrderCount, StringFormat='On the notice board: {0}'}" />
+            <Button Content="Revise clear count" Margin="0,6,0,0" HorizontalAlignment="Left" Click="OnReviseClear"
+                    ToolTip.Tip="Recounts every cleared quest and writes the total." />
+            <Button Content="Revise order count" Margin="0,4,0,0" HorizontalAlignment="Left" Click="OnReviseOrder"
+                    ToolTip.Tip="Recounts every quest currently on the notice board." />
+          </StackPanel>
+        </Border>
+      </WrapPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

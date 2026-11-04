@@ -1,0 +1,131 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:DQ9.Avalonia.ViewModels"
+        xmlns:svm="clr-namespace:DQ9.Avalonia.ViewModels.Screens"
+        xmlns:views="clr-namespace:DQ9.Avalonia.Views.Screens"
+        x:Class="DQ9.Avalonia.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="{Binding Title}"
+        Icon="/Assets/app.ico"
+        Width="1020" Height="680"
+        MinWidth="900" MinHeight="600"
+        WindowStartupLocation="CenterScreen">
+
+  <Design.DataContext>
+    <vm:MainViewModel />
+  </Design.DataContext>
+
+  <Window.DataTemplates>
+    <DataTemplate DataType="{x:Type svm:GeneralScreenViewModel}">
+      <views:GeneralScreen />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type svm:CharactersScreenViewModel}">
+      <views:CharactersScreen />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type svm:ItemsScreenViewModel}">
+      <views:ItemsScreen />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type svm:QuestsScreenViewModel}">
+      <views:QuestsScreen />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type svm:TitlesScreenViewModel}">
+      <views:TitlesScreen />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type svm:MonstersScreenViewModel}">
+      <views:MonstersScreen />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type svm:FlagsScreenViewModel}">
+      <views:FlagsScreen />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type svm:CollectionsScreenViewModel}">
+      <views:CollectionsScreen />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type svm:InnScreenViewModel}">
+      <views:InnScreen />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type svm:WifiScreenViewModel}">
+      <views:WifiScreen />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type svm:TreasureMapsScreenViewModel}">
+      <views:TreasureMapsScreen />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type svm:SearchScreenViewModel}">
+      <views:SearchScreen />
+    </DataTemplate>
+  </Window.DataTemplates>
+
+  <DockPanel Margin="8">
+    <Menu DockPanel.Dock="Top">
+      <MenuItem Header="_File">
+        <MenuItem Header="_Open..." Command="{Binding OpenCommand}" InputGesture="Ctrl+O" />
+        <MenuItem Header="_Save" Command="{Binding SaveCommand}" InputGesture="Ctrl+S" />
+        <MenuItem Header="Save _As..." Command="{Binding SaveAsCommand}" />
+        <Separator />
+        <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
+      </MenuItem>
+      <MenuItem Header="_Edit">
+        <MenuItem Header="_Undo" Command="{Binding UndoCommand}" InputGesture="Ctrl+Z" />
+        <MenuItem Header="_Redo" Command="{Binding RedoCommand}" InputGesture="Ctrl+Y" />
+        <Separator />
+        <MenuItem Header="Copy block 1 to block 2" Command="{Binding CopyBlock1ToBlock2Command}"
+                  ToolTip.Tip="Duplicates the main block into the intermission block (guest / DQVC data)." />
+      </MenuItem>
+    </Menu>
+
+    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,6,0,0" Spacing="12">
+      <TextBlock VerticalAlignment="Center" Text="Data block:" />
+      <RadioButton Content="Block 1" GroupName="Blocks"
+                   IsChecked="{Binding IsBlock1Checked}"
+                   ToolTip.Tip="The main save block (your game)." />
+      <RadioButton Content="Block 2 (intermission)" GroupName="Blocks"
+                   IsChecked="{Binding IsBlock2Checked}"
+                   IsEnabled="{Binding HasIntermission}"
+                   ToolTip.Tip="Intermission block: the guest / DQVC data of the second save block. Copy it with Edit ▸ Copy block 1 to block 2." />
+      <!-- UX-22: the bare "–" placeholder stays hidden until a file is open. -->
+      <TextBlock VerticalAlignment="Center" Classes="hint" Text="{Binding BlockInfoText}"
+                 IsVisible="{Binding HasBlockInfo}" />
+    </StackPanel>
+
+    <!-- UX-04 / UX-05 / UX-21: severity-styled, single-line status with the
+         dirty-state affordance visible inside the window. -->
+    <Border DockPanel.Dock="Bottom" Padding="0,6,0,0">
+      <StackPanel Orientation="Horizontal" Spacing="10">
+        <TextBlock Classes="warning" IsVisible="{Binding IsDirty}"
+                   Text="● Unsaved changes"
+                   ToolTip.Tip="Edits live in memory only — File ▸ Save (Ctrl+S) writes them to disk." />
+        <TextBlock Text="{Binding StatusText}"
+                   Classes.error="{Binding HasError}"
+                   Classes.warning="{Binding HasWarning}"
+                   TextTrimming="CharacterEllipsis"
+                   ToolTip.Tip="{Binding StatusText}" />
+      </StackPanel>
+    </Border>
+
+    <!-- UX-08: editors stay disabled until a save is loaded; a first-run
+         overlay tells the user what to do instead of dead-looking fields. -->
+    <Grid Margin="0,8,0,0">
+      <TabControl IsEnabled="{Binding HasOpenFile}" ItemsSource="{Binding Screens.Screens}">
+        <TabControl.ItemTemplate>
+          <DataTemplate DataType="{x:Type vm:EditorScreenViewModel}">
+            <TextBlock Text="{Binding Header}" />
+          </DataTemplate>
+        </TabControl.ItemTemplate>
+      </TabControl>
+
+      <Panel IsVisible="{Binding !HasOpenFile}">
+        <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                Padding="24,20" CornerRadius="6"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1">
+          <StackPanel MaxWidth="360" Spacing="8">
+            <TextBlock FontSize="16" FontWeight="SemiBold" Text="Open a DQ9 save to begin" />
+            <TextBlock Classes="hint" TextWrapping="Wrap"
+                       Text="Use File ▸ Open (Ctrl+O) to load a Dragon Quest IX save file. Every editor tab stays disabled until then, so no edit can be lost by typing into an empty session." />
+            <Button Content="Open a save file…" Command="{Binding OpenCommand}"
+                    HorizontalAlignment="Left" Margin="0,4,0,0" />
+          </StackPanel>
+        </Border>
+      </Panel>
+    </Grid>
+  </DockPanel>
+</Window>

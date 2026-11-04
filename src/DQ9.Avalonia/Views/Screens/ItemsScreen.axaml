@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DQ9.Avalonia.ViewModels.Screens"
+             x:Class="DQ9.Avalonia.Views.Screens.ItemsScreen"
+             x:DataType="vm:ItemsScreenViewModel">
+  <Grid ColumnDefinitions="240,*" RowDefinitions="Auto,*" Margin="8">
+      <StackPanel Grid.Column="0" Grid.Row="0">
+      <ComboBox Width="{DynamicResource FieldWideWidth}" ItemsSource="{Binding Stores}" SelectedItem="{Binding SelectedStore}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate><TextBlock Text="{Binding Display}" /></DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+      <TextBlock Classes="lbl" Text="Tool pouch party member" IsVisible="{Binding ToolsMode}" />
+      <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}" IsVisible="{Binding ToolsMode}">
+        <Button CommandParameter="0" Content="P1" Click="OnParty" />
+        <Button CommandParameter="1" Content="P2" Click="OnParty" />
+        <Button CommandParameter="2" Content="P3" Click="OnParty" />
+        <Button CommandParameter="3" Content="P4" Click="OnParty" />
+      </StackPanel>
+    </StackPanel>
+    <ListBox Grid.Column="0" Grid.Row="1" ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}">
+      <ListBox.ItemTemplate>
+        <DataTemplate><TextBlock Text="{Binding Display}" /></DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <ListBox Grid.Column="0" Grid.Row="1" ItemsSource="{Binding ToolSlots}" SelectedItem="{Binding SelectedSlot}"
+             IsVisible="{Binding ToolsMode}">
+      <ListBox.ItemTemplate>
+        <DataTemplate><TextBlock Text="{Binding Display}" /></DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <!-- UX-15: the details card stretches (capped) instead of hugging the
+         top-left corner of an empty right half. -->
+    <Border Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Classes="card"
+            VerticalAlignment="Top" HorizontalAlignment="Stretch" MaxWidth="560">
+      <StackPanel>
+        <TextBlock Classes="group">Edit slot</TextBlock>
+        <!-- UX-03: 1-based slot identity, matching the list’s #1 numbering. -->
+        <TextBlock Classes="readout" Text="{Binding SlotLabel}" />
+        <TextBlock Classes="lbl">Item</TextBlock>
+        <ComboBox Width="{DynamicResource FieldWideWidth}" ItemsSource="{Binding AllItems}" SelectedItem="{Binding SelectedItem}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate><TextBlock Text="{Binding Display}" /></DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Button Content="Search… (full list)" Margin="0,6,0,0" HorizontalAlignment="Left" Click="OnSearchItem"
+                ToolTip.Tip="Opens the searchable picker with the full list for this store." />
+        <TextBlock Classes="lbl">Count</TextBlock>
+        <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding Count}"
+                 ToolTip.Tip="0–255; tool-pouch slots carry no count." />
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>

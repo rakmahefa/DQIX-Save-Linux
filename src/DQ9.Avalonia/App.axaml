@@ -1,0 +1,132 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="DQ9.Avalonia.App"
+             RequestedThemeVariant="Default">
+  <Application.Resources>
+    <ResourceDictionary>
+
+      <!-- ══ Design tokens (UI/UX plan §4) ══════════════════════════════ -->
+      <!-- Spacing scale -->
+      <Thickness x:Key="PagePadding">8</Thickness>
+      <Thickness x:Key="CardPadding">12,10</Thickness>
+      <Thickness x:Key="CardGap">0,0,8,8</Thickness>
+      <Thickness x:Key="FieldLabelGap">0,8,0,2</Thickness>
+      <x:Double x:Key="FieldVerticalGap">6</x:Double>
+      <x:Double x:Key="ControlGapSmall">4</x:Double>
+      <x:Double x:Key="ControlGapMedium">8</x:Double>
+      <x:Double x:Key="ListColumnWidth">280</x:Double>
+      <x:Double x:Key="RowLabelWidth">120</x:Double>
+
+      <!-- Control widths: replaces the 19 ad-hoc literals (UX-12).
+           micro = 2-digit numbers (month, day, hour, count ≤ 99)
+           small = ≤ 4-digit counters (money, HP, year, victories)
+           medium = names, jobs, states
+           wide = long item names, save place, messages -->
+      <x:Double x:Key="FieldMicroWidth">64</x:Double>
+      <x:Double x:Key="FieldSmallWidth">96</x:Double>
+      <x:Double x:Key="FieldMediumWidth">160</x:Double>
+      <x:Double x:Key="FieldWideWidth">220</x:Double>
+      <x:Double x:Key="DialogMinWidth">360</x:Double>
+
+      <!-- Font sizes (Fluent default body = 12) -->
+      <x:Double x:Key="BodyFontSize">12</x:Double>
+      <x:Double x:Key="GroupFontSize">14</x:Double>
+      <x:Double x:Key="SubgroupFontSize">12</x:Double>
+      <x:Double x:Key="SublabelFontSize">11</x:Double>
+      <x:Double x:Key="TabFontSize">14</x:Double>
+
+      <!-- Control metrics -->
+      <x:Double x:Key="FieldMinHeight">30</x:Double>
+      <x:Double x:Key="ListRowMinHeight">32</x:Double>
+      <CornerRadius x:Key="CardCornerRadius">6</CornerRadius>
+
+      <!-- Status colors (never use Opacity for grays — UX-11) -->
+      <SolidColorBrush x:Key="ErrorBrush" Color="#C42B1C" />
+      <SolidColorBrush x:Key="WarningBrush" Color="#9D5D00" />
+      <SolidColorBrush x:Key="SuccessBrush" Color="#0F7B0F" />
+
+    </ResourceDictionary>
+  </Application.Resources>
+
+  <Application.Styles>
+    <FluentTheme />
+    <!-- P4 business screens: shared form styles -->
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseLowBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="{DynamicResource CardCornerRadius}" />
+      <Setter Property="Padding" Value="{DynamicResource CardPadding}" />
+      <Setter Property="Margin" Value="{DynamicResource CardGap}" />
+    </Style>
+    <Style Selector="TextBlock.group">
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="FontSize" Value="{DynamicResource GroupFontSize}" />
+      <Setter Property="Margin" Value="0,0,0,6" />
+    </Style>
+    <!-- UX-11: labels keep an AA-safe theme brush instead of Opacity 0.75 -->
+    <Style Selector="TextBlock.lbl">
+      <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+      <Setter Property="Margin" Value="{DynamicResource FieldLabelGap}" />
+    </Style>
+
+    <!-- UX-13: extended style vocabulary (group > subgroup > label/sublabel). -->
+    <Style Selector="TextBlock.subgroup">
+      <Setter Property="FontSize" Value="{DynamicResource SubgroupFontSize}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Margin" Value="0,10,0,4" />
+    </Style>
+    <Style Selector="TextBlock.sublbl">
+      <Setter Property="FontSize" Value="{DynamicResource SublabelFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+      <Setter Property="VerticalAlignment" Value="Bottom" />
+      <Setter Property="Margin" Value="0,0,0,4" />
+    </Style>
+    <Style Selector="TextBlock.hint">
+      <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+      <Setter Property="FontSize" Value="{DynamicResource SublabelFontSize}" />
+    </Style>
+    <Style Selector="TextBlock.readout">
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Margin" Value="0,4,0,0" />
+    </Style>
+    <!-- UX-05: status-bar error / warning severities. -->
+    <Style Selector="TextBlock.error">
+      <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="TextBlock.warning">
+      <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <!-- UX-01: red border on a field whose input failed validation. -->
+    <Style Selector="TextBox.invalid">
+      <Setter Property="BorderBrush" Value="{DynamicResource ErrorBrush}" />
+    </Style>
+    <!-- UX-16: destructive actions stand out and sit apart. -->
+    <Style Selector="Button.danger">
+      <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource ErrorBrush}" />
+    </Style>
+    <!-- Fixed-width fields sit flush-left inside (stretched) cards; without
+         this, an explicit Width + Stretch alignment centres them. -->
+    <Style Selector="Border.card StackPanel > TextBox">
+      <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+    <Style Selector="Border.card StackPanel > ComboBox">
+      <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+    <!-- UX-10: denser, non-clipping picker rows. -->
+    <Style Selector="ListBox.pickerList ListBoxItem">
+      <Setter Property="MinHeight" Value="{DynamicResource ListRowMinHeight}" />
+      <Setter Property="Padding" Value="10,4" />
+    </Style>
+
+    <!-- UX-07: compact single-row tab strip (Fluent default is ~24 px). -->
+    <Style Selector="TabItem">
+      <Setter Property="FontSize" Value="{DynamicResource TabFontSize}" />
+      <Setter Property="Padding" Value="10,5" />
+      <Setter Property="MinHeight" Value="34" />
+    </Style>
+  </Application.Styles>
+</Application>

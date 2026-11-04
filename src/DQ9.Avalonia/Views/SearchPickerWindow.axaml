@@ -1,0 +1,36 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:DQ9.Avalonia.ViewModels"
+        x:Class="DQ9.Avalonia.Views.SearchPickerWindow"
+        x:DataType="vm:SearchPickerViewModel"
+        Title="{Binding Title}"
+        Width="420" Height="480"
+        MinWidth="360" MinHeight="420"
+        WindowStartupLocation="CenterOwner"
+        CanResize="True"
+        ShowInTaskbar="False">
+
+  <DockPanel Margin="8">
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,10,0,0">
+      <Button Name="OkButton" Content="OK" MinWidth="72" Click="OnOk" IsEnabled="{Binding ConfirmEnabled}"
+              IsDefault="True" />
+      <Button Name="CancelButton" Content="Cancel" MinWidth="72" Click="OnCancel" IsCancel="True" />
+    </StackPanel>
+
+    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6"
+                IsVisible="{Binding TypeSelectorVisible}">
+      <TextBlock VerticalAlignment="Center" Text="Pick from" />
+      <ComboBox Width="{DynamicResource FieldMediumWidth}" ItemsSource="{Binding Types}" SelectedIndex="{Binding SelectedTypeIndex}" />
+    </StackPanel>
+
+    <TextBox DockPanel.Dock="Top" Name="SearchBox" Watermark="Search (supports regex)" Margin="0,6,0,6"
+             Text="{Binding Search}" />
+
+    <ListBox Name="List" Classes="pickerList" ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}"
+             DoubleTapped="OnRowDoubleTapped">
+      <ListBox.ItemTemplate>
+        <DataTemplate><TextBlock Text="{Binding Display}" /></DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </DockPanel>
+</Window>

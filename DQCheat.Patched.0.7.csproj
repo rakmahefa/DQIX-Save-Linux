@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>DQ9_Cheat</AssemblyName>
+    <ApplicationVersion>0.7.0.57</ApplicationVersion>
+    <LangVersion>latest</LangVersion>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <FileVersion>0.6.0.56</FileVersion>
+    <Product>DQ9_Cheat</Product>
+    <Copyright>asa-o</Copyright>
+    <AssemblyTitle>Dragon Quest IX Save Data Editor</AssemblyTitle>
+    <AssemblyVersion>0.7.0.57</AssemblyVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The save engine lives in the portable DQ9.Core assembly.
+         Exclude the nested projects from this project's default globs. -->
+    <Compile Remove="src/**/*.cs" />
+    <Compile Remove="tests/**/*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="src\DQ9.Core\DQ9.Core.csproj" />
+  </ItemGroup>
+
+</Project>

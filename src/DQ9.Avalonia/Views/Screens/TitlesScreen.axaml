@@ -1,0 +1,70 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DQ9.Avalonia.ViewModels.Screens"
+             x:Class="DQ9.Avalonia.Views.Screens.TitlesScreen"
+             x:DataType="vm:TitlesScreenViewModel">
+  <Grid ColumnDefinitions="300,*" Margin="8">
+    <ListBox Grid.Column="0" ItemsSource="{Binding Titles}" SelectedItem="{Binding SelectedTitle}">
+      <ListBox.ItemTemplate>
+        <DataTemplate><TextBlock Text="{Binding Display}" /></DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <ScrollViewer Grid.Column="1">
+      <WrapPanel>
+        <Border Classes="card">
+          <StackPanel>
+            <TextBlock Classes="group">Title of the selected entry</TextBlock>
+            <CheckBox Content="Held" IsChecked="{Binding SelectedTitle.IsHold}" />
+            <TextBlock Classes="readout" Text="{Binding TitleCount, StringFormat='Titles held: {0}'}" />
+            <Button Content="Revise title count" Margin="0,6,0,0" HorizontalAlignment="Left" Click="OnReviseCount"
+                    ToolTip.Tip="Recounts every held title and writes the total." />
+          </StackPanel>
+        </Border>
+        <Border Classes="card">
+          <StackPanel>
+            <TextBlock Classes="group">First clear records</TextBlock>
+            <TextBlock Classes="lbl">Play time (h / m / s)</TextBlock>
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}">
+              <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding PlayHour}" />
+              <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding PlayMinute}" />
+              <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding PlaySecond}" />
+            </StackPanel>
+            <TextBlock Classes="lbl">Multiplayer (h / m / s)</TextBlock>
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}">
+              <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding MultiHour}" />
+              <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding MultiMinute}" />
+              <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding MultiSecond}" />
+            </StackPanel>
+            <!-- UX-02: per-field micro-labels replace the "Victories / alchemy" composite. -->
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}" Margin="0,8,0,0">
+              <StackPanel>
+                <TextBlock Classes="sublbl">Victories</TextBlock>
+                <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding VictoryCount}" />
+              </StackPanel>
+              <StackPanel>
+                <TextBlock Classes="sublbl">Alchemy</TextBlock>
+                <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding AlchemyCount}" />
+              </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}" Margin="0,6,0,0">
+              <StackPanel>
+                <TextBlock Classes="sublbl">Quests</TextBlock>
+                <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding QuestCount}" />
+              </StackPanel>
+              <StackPanel>
+                <TextBlock Classes="sublbl">Visitors</TextBlock>
+                <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding VisitorCount}" />
+              </StackPanel>
+              <StackPanel>
+                <TextBlock Classes="sublbl">Maps</TextBlock>
+                <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding TreasureMapCount}" />
+              </StackPanel>
+            </StackPanel>
+            <TextBlock Classes="lbl">First-clear title</TextBlock>
+            <ComboBox Width="{DynamicResource FieldWideWidth}" ItemsSource="{Binding FirstClearTitles}" SelectedItem="{Binding SelectedFirstClearTitle}" />
+          </StackPanel>
+        </Border>
+      </WrapPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

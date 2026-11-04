@@ -1,0 +1,177 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DQ9.Avalonia.ViewModels.Screens"
+             x:Class="DQ9.Avalonia.Views.Screens.CharactersScreen"
+             x:DataType="vm:CharactersScreenViewModel">
+  <Grid ColumnDefinitions="240,*" Margin="8">
+    <ListBox Grid.Column="0" ItemsSource="{Binding Characters}" SelectedItem="{Binding SelectedCharacter}">
+      <ListBox.ItemTemplate>
+        <DataTemplate><TextBlock Text="{Binding Display}" /></DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <ScrollViewer Grid.Column="1">
+      <WrapPanel>
+        <Border Classes="card">
+          <StackPanel>
+            <TextBlock Classes="group">Identity</TextBlock>
+            <TextBlock Classes="lbl">Name</TextBlock>
+            <TextBox Width="{DynamicResource FieldMediumWidth}" Text="{Binding Name}"
+                     ToolTip.Tip="Character name — unreadable characters are bytes that do not map to game text." />
+            <!-- UX-20: coded value becomes a choice. -->
+            <TextBlock Classes="lbl">Sex</TextBlock>
+            <ComboBox Width="{DynamicResource FieldSmallWidth}" SelectedIndex="{Binding Sex}"
+                      ToolTip.Tip="0 = male, 1 = female.">
+              <ComboBoxItem>Male</ComboBoxItem>
+              <ComboBoxItem>Female</ComboBoxItem>
+            </ComboBox>
+            <TextBlock Classes="lbl">Job</TextBlock>
+            <ComboBox Width="{DynamicResource FieldMediumWidth}" ItemsSource="{Binding Jobs}" SelectedItem="{Binding SelectedJob}" />
+            <TextBlock Classes="lbl">Strategy</TextBlock>
+            <ComboBox Width="{DynamicResource FieldMediumWidth}" ItemsSource="{Binding Strategies}" SelectedItem="{Binding SelectedStrategy}" />
+            <TextBlock Classes="lbl">Skill points</TextBlock>
+            <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding SkillPoint}" />
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapMedium}" Margin="0,6,0,0">
+              <CheckBox Content="Die" IsChecked="{Binding Die}" />
+              <CheckBox Content="Poison" IsChecked="{Binding Poison}" />
+              <CheckBox Content="Curse" IsChecked="{Binding Curse}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <Border Classes="card">
+          <StackPanel>
+            <TextBlock Classes="group">HP / MP</TextBlock>
+            <TextBlock Classes="lbl">Now HP</TextBlock><TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding NowHp}" />
+            <TextBlock Classes="lbl">Max HP</TextBlock><TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding MaxHp}" />
+            <TextBlock Classes="lbl">Now MP</TextBlock><TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding NowMp}" />
+            <TextBlock Classes="lbl">Max MP</TextBlock><TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding MaxMp}" />
+          </StackPanel>
+        </Border>
+        <Border Classes="card">
+          <StackPanel>
+            <TextBlock Classes="group">Equipment</TextBlock>
+            <TextBlock Classes="lbl">Weapon</TextBlock>
+            <ComboBox Width="{DynamicResource FieldWideWidth}" ItemsSource="{Binding Weapons}" SelectedItem="{Binding Weapon}" />
+            <TextBlock Classes="lbl">Shield</TextBlock>
+            <ComboBox Width="{DynamicResource FieldWideWidth}" ItemsSource="{Binding Shields}" SelectedItem="{Binding Shield}" />
+            <TextBlock Classes="lbl">Head</TextBlock>
+            <ComboBox Width="{DynamicResource FieldWideWidth}" ItemsSource="{Binding Heads}" SelectedItem="{Binding Head}" />
+            <TextBlock Classes="lbl">Upper body</TextBlock>
+            <ComboBox Width="{DynamicResource FieldWideWidth}" ItemsSource="{Binding UpperBodies}" SelectedItem="{Binding UpperBody}" />
+            <TextBlock Classes="lbl">Arms</TextBlock>
+            <ComboBox Width="{DynamicResource FieldWideWidth}" ItemsSource="{Binding Arms}" SelectedItem="{Binding Arm}" />
+            <TextBlock Classes="lbl">Lower body</TextBlock>
+            <ComboBox Width="{DynamicResource FieldWideWidth}" ItemsSource="{Binding LowerBodies}" SelectedItem="{Binding LowerBody}" />
+            <TextBlock Classes="lbl">Shoes</TextBlock>
+            <ComboBox Width="{DynamicResource FieldWideWidth}" ItemsSource="{Binding Shoes}" SelectedItem="{Binding Shoe}" />
+            <TextBlock Classes="lbl">Accessory</TextBlock>
+            <ComboBox Width="{DynamicResource FieldWideWidth}" ItemsSource="{Binding Accessories}" SelectedItem="{Binding Accessory}" />
+          </StackPanel>
+        </Border>
+        <Border Classes="card">
+          <StackPanel>
+            <TextBlock Classes="group">Appearance</TextBlock>
+            <TextBlock Classes="lbl">Face / Hair / Hair color</TextBlock>
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}">
+              <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding FaceType}" />
+              <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding HairType}" />
+              <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding HairColor}" />
+            </StackPanel>
+            <TextBlock Classes="lbl">Skin / Eye</TextBlock>
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}">
+              <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding SkinColor}" />
+              <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding EyeColor}" />
+            </StackPanel>
+            <TextBlock Classes="lbl">Figure (W / H)</TextBlock>
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}">
+              <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding FigureWidth}" />
+              <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding FigureHeight}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <Border Classes="card">
+          <StackPanel>
+            <TextBlock Classes="group">Job levels &amp; experience</TextBlock>
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapMedium}">
+              <TextBlock Width="{DynamicResource RowLabelWidth}" />
+              <TextBlock Width="{DynamicResource FieldMicroWidth}" Classes="lbl">Level</TextBlock>
+              <TextBlock Width="{DynamicResource FieldMediumWidth}" Classes="lbl">Experience</TextBlock>
+            </StackPanel>
+            <ItemsControl ItemsSource="{Binding JobLevels}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapMedium}" Margin="0,2">
+                    <TextBlock Width="{DynamicResource RowLabelWidth}" Text="{Binding Name}" VerticalAlignment="Center" />
+                    <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding Level.Value}"
+                             ToolTip.Tip="Level of this job (0–99)." />
+                    <TextBox Width="{DynamicResource FieldMediumWidth}" Text="{Binding Experience.Value}"
+                             ToolTip.Tip="Experience points of this job (0–999 999 999), as edited by the original tool." />
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+        <Border Classes="card">
+          <StackPanel>
+            <TextBlock Classes="group">Vocation to edit</TextBlock>
+            <ComboBox Width="{DynamicResource FieldMediumWidth}" ItemsSource="{Binding Jobs}" SelectedItem="{Binding SelectedEditJob}"
+                      ToolTip.Tip="The job whose seeds and skill levels are edited below — independent of the character's own job." />
+            <TextBlock Classes="lbl">Revocations (0–10)</TextBlock>
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding Transmigration}" />
+            <TextBlock Classes="lbl">Seeds (revise, 0–999)</TextBlock>
+            <ItemsControl ItemsSource="{Binding ReviseRows}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapMedium}" Margin="0,2">
+                    <TextBlock Width="{DynamicResource RowLabelWidth}" Text="{Binding Name}" VerticalAlignment="Center" />
+                    <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding Value}" />
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Classes="lbl">Skill levels (0–100)</TextBlock>
+            <ItemsControl ItemsSource="{Binding SkillLevelRows}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapMedium}" Margin="0,2">
+                    <TextBlock Width="{DynamicResource RowLabelWidth}" Text="{Binding Name}" VerticalAlignment="Center" />
+                    <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding Value}" />
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+        <Border Classes="card">
+          <StackPanel>
+            <TextBlock Classes="group">Abilities &amp; traits</TextBlock>
+            <TextBlock Classes="lbl">Skill / specialty table</TextBlock>
+            <ComboBox Width="{DynamicResource FieldWideWidth}" ItemsSource="{Binding Skills}" SelectedItem="{Binding SelectedSkill}" />
+            <TextBlock Classes="lbl">Traits (specialties)</TextBlock>
+            <ItemsControl ItemsSource="{Binding SkillSpecialtyRows}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked}" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Classes="lbl">Abilities (effects)</TextBlock>
+            <ItemsControl ItemsSource="{Binding SkillEffectRows}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked}" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapMedium}" Margin="0,6,0,0">
+              <CheckBox Content="Zoom" IsChecked="{Binding LearnRuler}"
+                        ToolTip.Tip="Teach the Zoom (engine: 'ruler') specialty of the selected skill." />
+              <CheckBox Content="Egg On" IsChecked="{Binding LearnCheer}"
+                        ToolTip.Tip="Teach the Egg On (engine: 'cheer') specialty of the selected skill." />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </WrapPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

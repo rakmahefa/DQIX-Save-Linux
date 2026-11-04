@@ -1,0 +1,131 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DQ9.Avalonia.ViewModels.Screens"
+             x:Class="DQ9.Avalonia.Views.Screens.GeneralScreen"
+             x:DataType="vm:GeneralScreenViewModel">
+  <ScrollViewer>
+    <WrapPanel Margin="8">
+      <Border Classes="card">
+        <StackPanel>
+          <TextBlock Classes="group">Money &amp; counters</TextBlock>
+          <TextBlock Classes="lbl">Money</TextBlock><TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding Money}" />
+          <TextBlock Classes="lbl">Bank</TextBlock><TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding BankMoney}" />
+          <TextBlock Classes="lbl">Medals</TextBlock><TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding Medal}" />
+          <TextBlock Classes="lbl">Alchemy count</TextBlock><TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding AlchemyCount}" />
+          <TextBlock Classes="lbl">Victories</TextBlock><TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding VictoryCount}" />
+          <!-- UX-02: paired boxes get per-field micro-labels on one row. -->
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}" Margin="0,8,0,0">
+            <StackPanel>
+              <TextBlock Classes="sublbl">Battles</TextBlock>
+              <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding BattleCount}" />
+            </StackPanel>
+            <StackPanel>
+              <TextBlock Classes="sublbl">Losses</TextBlock>
+              <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding LoseCount}" />
+            </StackPanel>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}" Margin="0,6,0,0">
+            <StackPanel>
+              <TextBlock Classes="sublbl">Escapes</TextBlock>
+              <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding EscapeCount}" />
+            </StackPanel>
+            <StackPanel>
+              <TextBlock Classes="sublbl">Successful</TextBlock>
+              <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding EscapeSuccessCount}" />
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      <Border Classes="card">
+        <StackPanel>
+          <TextBlock Classes="group">Play time</TextBlock>
+          <TextBlock Classes="lbl">Single player (h / m / s)</TextBlock>
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}">
+            <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding PlayHour}" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding PlayMinute}" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding PlaySecond}" />
+          </StackPanel>
+          <TextBlock Classes="lbl">Multiplayer (h / m / s)</TextBlock>
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}">
+            <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding MultiHour}" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding MultiMinute}" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding MultiSecond}" />
+          </StackPanel>
+          <TextBlock Classes="lbl">Save place</TextBlock>
+          <ComboBox Width="{DynamicResource FieldWideWidth}" ItemsSource="{Binding SavePlaces}" SelectedItem="{Binding SelectedSavePlace}" />
+        </StackPanel>
+      </Border>
+      <Border Classes="card">
+        <StackPanel>
+          <TextBlock Classes="group">Profile</TextBlock>
+          <TextBlock Classes="lbl">Message</TextBlock>
+          <TextBox Width="{DynamicResource FieldWideWidth}" Height="60" AcceptsReturn="False" TextWrapping="Wrap"
+                   Text="{Binding ProfileMessage}"
+                   ToolTip.Tip="Shown to other players over Wi-Fi. Unreadable characters are bytes that do not map to game text." />
+          <TextBlock Classes="lbl">Birthday (Y / M / D)</TextBlock>
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}">
+            <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding BirthYear}" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding BirthMonth}" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding BirthDay}" />
+          </StackPanel>
+          <!-- UX-20: coded values become choices. -->
+          <TextBlock Classes="lbl">Sex</TextBlock>
+          <ComboBox Width="{DynamicResource FieldSmallWidth}" SelectedIndex="{Binding ProfileSex}"
+                    ToolTip.Tip="0 = male, 1 = female.">
+            <ComboBoxItem>Male</ComboBoxItem>
+            <ComboBoxItem>Female</ComboBoxItem>
+          </ComboBox>
+          <TextBlock Classes="lbl">Tone</TextBlock>
+          <ComboBox Width="{DynamicResource FieldMicroWidth}" ItemsSource="{Binding ToneOptions}"
+                    SelectedIndex="{Binding ProfileTone}"
+                    ToolTip.Tip="Profile speech tone (0–7); affects how your tag-mode profile sounds." />
+          <CheckBox Content="Profile set" IsChecked="{Binding ProfileSetting}" Margin="0,6,0,0" />
+          <CheckBox Content="Secret age" IsChecked="{Binding ProfileSecretAge}" />
+          <CheckBox Content="Show explanation" IsChecked="{Binding ProfileExplanation}" />
+        </StackPanel>
+      </Border>
+      <Border Classes="card">
+        <StackPanel>
+          <TextBlock Classes="group">Address &amp; handle</TextBlock>
+          <TextBlock Classes="lbl">Address</TextBlock>
+          <ComboBox Width="{DynamicResource FieldWideWidth}" ItemsSource="{Binding Addresses}" SelectedItem="{Binding SelectedAddress}" />
+          <TextBlock Classes="lbl">Handle (job)</TextBlock>
+          <ComboBox Width="{DynamicResource FieldWideWidth}" ItemsSource="{Binding Handles}" SelectedItem="{Binding SelectedHandle}" />
+          <TextBlock Classes="lbl">Current handle</TextBlock>
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapMedium}">
+            <TextBox Width="{DynamicResource FieldMediumWidth}" IsReadOnly="True" Text="{Binding HandleDisplay}" />
+            <Button Name="PickHandleButton" Content="Pick… (incl. accolades)" Click="OnPickHandle"
+                    ToolTip.Tip="Opens the searchable picker: occupations and accolades (titles)." />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      <Border Classes="card">
+        <StackPanel>
+          <TextBlock Classes="group">Gestures — party tricks (learned)</TextBlock>
+          <ItemsControl ItemsSource="{Binding GestureLearn}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+      <Border Classes="card">
+        <StackPanel>
+          <TextBlock Classes="group">Gestures — directions</TextBlock>
+          <ItemsControl ItemsSource="{Binding GestureDirections}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapMedium}" Margin="0,2">
+                  <TextBlock Width="{DynamicResource RowLabelWidth}" VerticalAlignment="Center" Text="{Binding Name}" />
+                  <ComboBox Width="{DynamicResource FieldMediumWidth}" ItemsSource="{Binding Options}" SelectedItem="{Binding Selected}" />
+                </StackPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+    </WrapPanel>
+  </ScrollViewer>
+</UserControl>

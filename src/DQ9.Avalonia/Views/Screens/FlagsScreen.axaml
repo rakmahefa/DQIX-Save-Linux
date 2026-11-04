@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DQ9.Avalonia.ViewModels.Screens"
+             x:Class="DQ9.Avalonia.Views.Screens.FlagsScreen"
+             x:DataType="vm:FlagsScreenViewModel">
+  <ScrollViewer>
+    <WrapPanel Margin="8">
+      <Border Classes="card">
+        <StackPanel>
+          <TextBlock Classes="group">Switches</TextBlock>
+          <!-- UX-22: the engine bit is the Zoom ability — one name everywhere. -->
+          <CheckBox Content="Disable Zoom" IsChecked="{Binding DisableRuler}"
+                    ToolTip.Tip="Disables the Zoom spell for the party (engine flag 'ruler')." />
+        </StackPanel>
+      </Border>
+      <Border Classes="card">
+        <StackPanel>
+          <TextBlock Classes="group">Change job allowed</TextBlock>
+          <ItemsControl ItemsSource="{Binding AllowChangeJob}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+      <Border Classes="card">
+        <StackPanel>
+          <TextBlock Classes="group">Destinations</TextBlock>
+          <ItemsControl ItemsSource="{Binding Destinations}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+    </WrapPanel>
+  </ScrollViewer>
+</UserControl>

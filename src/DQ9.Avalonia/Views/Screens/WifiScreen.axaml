@@ -1,0 +1,64 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DQ9.Avalonia.ViewModels.Screens"
+             x:Class="DQ9.Avalonia.Views.Screens.WifiScreen"
+             x:DataType="vm:WifiScreenViewModel">
+  <ScrollViewer>
+    <WrapPanel Margin="8">
+      <Border Classes="card">
+        <StackPanel>
+          <TextBlock Classes="group">Shop message</TextBlock>
+          <TextBox Width="{DynamicResource FieldWideWidth}" Height="70" TextWrapping="Wrap" Text="{Binding Message}"
+                   ToolTip.Tip="DQVC shop announcement — unreadable characters are bytes that do not map to game text." />
+          <TextBlock Classes="lbl">Message expiry (Y / M / D H)</TextBlock>
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}">
+            <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding MessageExpiresYear}" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding MessageExpiresMonth}" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding MessageExpiresDay}" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding MessageExpiresHour}" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      <Border Classes="card">
+        <StackPanel>
+          <!-- UX-13: mid-card section headers use .subgroup, not .group. -->
+          <TextBlock Classes="subgroup">Goods expiry (Y / M / D H)</TextBlock>
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}">
+            <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding ExpiresYear}" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding ExpiresMonth}" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding ExpiresDay}" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding ExpiresHour}" />
+          </StackPanel>
+          <TextBlock Classes="subgroup">Next connect (Y / M / D H)</TextBlock>
+          <StackPanel Orientation="Horizontal" Spacing="{DynamicResource ControlGapSmall}">
+            <TextBox Width="{DynamicResource FieldSmallWidth}" Text="{Binding NextConnectYear}" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding NextConnectMonth}" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding NextConnectDay}" />
+            <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding NextConnectHour}" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      <Border Classes="card">
+        <StackPanel>
+          <TextBlock Classes="group">Goods</TextBlock>
+          <TextBlock Classes="lbl">Goods slot</TextBlock>
+          <ComboBox Width="{DynamicResource FieldSmallWidth}" ItemsSource="{Binding GoodsSlots}"
+                    SelectedItem="{Binding SelectedGoodsSlot}">
+            <ComboBox.ItemTemplate>
+              <DataTemplate><TextBlock Text="{Binding Label}" /></DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+          <TextBlock Classes="lbl">Item</TextBlock>
+          <ComboBox Width="{DynamicResource FieldWideWidth}" ItemsSource="{Binding GoodsItems}" SelectedItem="{Binding SelectedGoodsItem}">
+            <ComboBox.ItemTemplate>
+              <DataTemplate><TextBlock Text="{Binding Display}" /></DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+          <TextBlock Classes="lbl">Count</TextBlock>
+          <TextBox Width="{DynamicResource FieldMicroWidth}" Text="{Binding GoodsCount}" />
+          <TextBlock Classes="readout" Text="{Binding GoodsPrice, StringFormat='Price: {0}'}" />
+        </StackPanel>
+      </Border>
+    </WrapPanel>
+  </ScrollViewer>
+</UserControl>

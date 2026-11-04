@@ -1,0 +1,290 @@
+name: CI - Windows cross-build and native Linux
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  windows:
+    name: Legacy WinForms client (win-x64 cross-build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v7
+
+      - name: Set up .NET 10 SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+          cache: true
+          cache-dependency-path: DQCheat.Patched.0.7.csproj
+
+      - name: Show .NET environment
+        run: dotnet --info
+
+      - name: Restore Windows x64 dependencies
+        run: >
+          dotnet restore DQCheat.Patched.0.7.csproj
+          --runtime win-x64
+          -p:EnableWindowsTargeting=true
+
+      - name: Build Release (net10.0-windows)
+        run: >
+          dotnet build DQCheat.Patched.0.7.csproj
+          --configuration Release
+          --runtime win-x64
+          --no-restore
+          -p:EnableWindowsTargeting=true
+          -p:ContinuousIntegrationBuild=true
+
+      - name: Publish Windows x64 application
+        run: >
+          dotnet publish DQCheat.Patched.0.7.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained false
+          --no-restore
+          -p:EnableWindowsTargeting=true
+          -p:ContinuousIntegrationBuild=true
+
+      - name: Verify published executable
+        shell: bash
+        run: |
+          publish_dir="bin/Release/net10.0-windows/win-x64/publish"
+          test -s "$publish_dir/DQ9_Cheat.exe"
+          test -s "$publish_dir/DQ9_Cheat.dll"
+          file "$publish_dir/DQ9_Cheat.exe"
+          echo "Published files:"
+          find "$publish_dir" -maxdepth 1 -type f -printf '%f\n' | sort
+
+      - name: Upload Windows x64 build
+        uses: actions/upload-artifact@v7
+        with:
+          name: DQ9_Cheat-win-x64
+          path: bin/Release/net10.0-windows/win-x64/publish/
+          if-no-files-found: error
+          retention-days: 14
+
+  windows-avalonia:
+    name: Avalonia client on Windows (${{ matrix.runtime }})
+    runs-on: windows-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [win-x64, win-arm64]
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v7
+
+      - name: Set up .NET 10 SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+          cache: true
+          cache-dependency-path: |
+            src/DQ9.Core/DQ9.Core.csproj
+            src/DQ9.Avalonia/DQ9.Avalonia.csproj
+
+      - name: Publish Avalonia client (${{ matrix.runtime }})
+        run: >
+          dotnet publish src/DQ9.Avalonia/DQ9.Avalonia.csproj
+          --configuration Release
+          --runtime ${{ matrix.runtime }}
+          --self-contained false
+          -p:ContinuousIntegrationBuild=true
+
+      - name: Verify published executable is a Windows PE
+        shell: pwsh
+        run: |
+          $publish = "src/DQ9.Avalonia/bin/Release/net10.0/${{ matrix.runtime }}/publish"
+          Test-Path "$publish/DQ9.Avalonia.exe" | ForEach-Object {
+            if (-not $_) { throw "missing DQ9.Avalonia.exe" }
+          }
+          Get-Content -Raw -Encoding Byte "$publish/DQ9.Avalonia.exe" -TotalCount 2 |
+            ForEach-Object { [System.Text.Encoding]::ASCII.GetString($_) } |
+            ForEach-Object { if ($_ -ne 'MZ') { throw "not a PE executable" } }
+
+      - name: Run Core reference tests on Windows
+        run: >
+          dotnet test tests/DQ9.Core.Tests/DQ9.Core.Tests.csproj
+          --configuration Release
+          --logger "console;verbosity=normal"
+
+      - name: Package zip
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "src/DQ9.Avalonia/bin/Release/net10.0/${{ matrix.runtime }}/publish/*" `
+            -DestinationPath "DQ9.Avalonia-${{ matrix.runtime }}.zip"
+
+      - name: Generate SHA-256 checksum
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash "DQ9.Avalonia-${{ matrix.runtime }}.zip" -Algorithm SHA256).Hash.ToLower()
+          "$hash  DQ9.Avalonia-${{ matrix.runtime }}.zip" | Out-File -Encoding ascii "DQ9.Avalonia-${{ matrix.runtime }}.zip.sha256"
+
+      - name: Upload Windows Avalonia build
+        uses: actions/upload-artifact@v7
+        with:
+          name: DQ9.Avalonia-${{ matrix.runtime }}
+          path: |
+            DQ9.Avalonia-${{ matrix.runtime }}.zip
+            DQ9.Avalonia-${{ matrix.runtime }}.zip.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  linux:
+    name: Native Linux (Core tests + Avalonia ELF)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v7
+
+      - name: Set up .NET 10 SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+          cache: true
+          cache-dependency-path: |
+            src/DQ9.Core/DQ9.Core.csproj
+            src/DQ9.Avalonia/DQ9.Avalonia.csproj
+            tests/DQ9.Core.Tests/DQ9.Core.Tests.csproj
+
+      - name: Build portable Core (ELF target, no Windows dependency)
+        run: >
+          dotnet build src/DQ9.Core/DQ9.Core.csproj
+          --configuration Release
+          -p:ContinuousIntegrationBuild=true
+
+      - name: Run Core reference tests (P0 baseline)
+        run: >
+          dotnet test tests/DQ9.Core.Tests/DQ9.Core.Tests.csproj
+          --configuration Release
+          --logger "console;verbosity=normal"
+
+      - name: Publish Avalonia shell for linux-x64
+        run: >
+          dotnet publish src/DQ9.Avalonia/DQ9.Avalonia.csproj
+          --configuration Release
+          --runtime linux-x64
+          --self-contained false
+          -p:ContinuousIntegrationBuild=true
+
+      - name: Verify published binary is a Linux ELF (never a PE)
+        shell: bash
+        run: |
+          publish_dir="src/DQ9.Avalonia/bin/Release/net10.0/linux-x64/publish"
+          test -s "$publish_dir/DQ9.Avalonia"
+          file "$publish_dir/DQ9.Avalonia" | grep -q "ELF 64-bit LSB.*x86-64"
+          file "$publish_dir/DQ9.Avalonia" | grep -q "interpreter /lib64/ld-linux"
+          if file "$publish_dir/DQ9.Avalonia" | grep -q "PE32"; then
+            echo "::error::published binary is a Windows PE, not a Linux ELF"
+            exit 1
+          fi
+          readelf -h "$publish_dir/DQ9.Avalonia"
+
+      - name: Headless smoke test (open, edit, save as, reopen)
+        shell: bash
+        run: |
+          publish_dir="src/DQ9.Avalonia/bin/Release/net10.0/linux-x64/publish"
+          export DQ9_SMOKE=headless
+          "$publish_dir/DQ9.Avalonia"
+          echo "headless smoke exit code: $?"
+
+      - name: Display smoke test under Xvfb (X11)
+        shell: bash
+        run: |
+          publish_dir="src/DQ9.Avalonia/bin/Release/net10.0/linux-x64/publish"
+          if command -v xvfb-run >/dev/null 2>&1; then
+            export DQ9_SMOKE_UI=1
+            xvfb-run -a "$publish_dir/DQ9.Avalonia"
+          else
+            echo "::warning::xvfb-run unavailable, display smoke skipped"
+          fi
+
+      - name: Package tar.gz
+        run: >
+          tar -czf DQ9.Avalonia-linux-x64.tar.gz
+          -C src/DQ9.Avalonia/bin/Release/net10.0/linux-x64/publish .
+
+      - name: Generate SHA-256 checksum
+        run: sha256sum DQ9.Avalonia-linux-x64.tar.gz > DQ9.Avalonia-linux-x64.tar.gz.sha256
+
+      - name: Upload Linux build
+        uses: actions/upload-artifact@v7
+        with:
+          name: DQ9.Avalonia-linux-x64
+          path: |
+            DQ9.Avalonia-linux-x64.tar.gz
+            DQ9.Avalonia-linux-x64.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  linux-packages:
+    name: Linux packages (Debian + AppImage)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: linux
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v7
+
+      - name: Set up .NET 10 SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+          cache: true
+          cache-dependency-path: src/DQ9.Avalonia/DQ9.Avalonia.csproj
+
+      - name: Build Debian package
+        run: ./pack/linux/build-deb.sh "${{ github.ref_name }}-auto" dist
+
+      - name: Build AppImage
+        run: ./pack/linux/build-appimage.sh "${{ github.ref_name }}-auto" dist
+
+      - name: Smoke-test the AppImage (no-FUSE extraction)
+        run: |
+          export DQ9_SMOKE=headless
+          ./dist/dq9-save-editor-*-x86_64.AppImage --appimage-extract-and-run
+
+      - name: Generate SHA-256 checksums
+        run: |
+          cd dist
+          sha256sum dq9-save-editor_*.deb >> SHA256SUMS
+          sha256sum dq9-save-editor-*.AppImage >> SHA256SUMS
+          sha256sum dq9-save-editor-*.AppImage.zsync >> SHA256SUMS
+
+      - name: Upload Linux packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: DQ9.Avalonia-linux-packages
+          path: |
+            dist/dq9-save-editor_*.deb
+            dist/dq9-save-editor-*.AppImage
+            dist/dq9-save-editor-*.AppImage.zsync
+            dist/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,106 @@
+diff --git a/src/DQ9.Avalonia/App.axaml.cs b/src/DQ9.Avalonia/App.axaml.cs
+index 3b00eb7..f54cad2 100644
+--- a/src/DQ9.Avalonia/App.axaml.cs
++++ b/src/DQ9.Avalonia/App.axaml.cs
+@@ -1,5 +1,9 @@
++using System;
+ using Avalonia;
++using Avalonia.Controls;
++using Avalonia.Controls.ApplicationLifetimes;
+ using Avalonia.Markup.Xaml;
++using DQ9.Avalonia.Views;
+ 
+ namespace DQ9.Avalonia;
+ 
+@@ -9,4 +13,17 @@ public class App : Application
+     {
+         AvaloniaXamlLoader.Load(this);
+     }
++
++    public override void OnFrameworkInitializationCompleted()
++    {
++        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
++        {
++            // Normal (non-smoke) startup: create and register the main window.
++            // The lifetime shows it once this method returns. Smoke harnesses
++            // bypass this path because they manage their own windows.
++            desktop.MainWindow = new MainWindow();
++        }
++
++        base.OnFrameworkInitializationCompleted();
++    }
+ }
+diff --git a/src/DQ9.Avalonia/Program.cs b/src/DQ9.Avalonia/Program.cs
+index 0f1841c..1423401 100644
+--- a/src/DQ9.Avalonia/Program.cs
++++ b/src/DQ9.Avalonia/Program.cs
+@@ -1,5 +1,6 @@
+ using System;
+ using Avalonia;
++using Avalonia.Logging;
+ using DQ9.Avalonia.Infrastructure;
+ 
+ namespace DQ9.Avalonia;
+@@ -34,14 +35,58 @@ internal static class Program
+             return;
+         }
+ 
+-        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
++        // Normal interactive startup. Log fatal errors to stderr so a user
++        // running the app from a terminal sees why no window appeared.
++        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
++            Console.Error.WriteLine("[dq9] FATAL " + e.ExceptionObject);
++
++        try
++        {
++            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
++        }
++        catch (Exception ex)
++        {
++            Console.Error.WriteLine("[dq9] the UI could not start: " + ex);
++            Console.Error.WriteLine(
++                "[dq9] hint: this build renders through X11/XWayland; make sure DISPLAY is set (XWayland is enabled by default on GNOME/KDE).");
++            Environment.ExitCode = 1;
++        }
+     }
+ 
+     public static AppBuilder BuildAvaloniaApp()
+     {
+-        return AppBuilder.Configure<App>()
++        var builder = AppBuilder.Configure<App>()
+             .UsePlatformDetect()
+-            .WithInterFont()
+-            .LogToTrace();
++            .WithInterFont();
++
++        // DQ9_DEBUG=1 sends Avalonia logs to the terminal (LogToTrace goes to
++        // System.Diagnostics.Trace, which is invisible from a shell).
++        if (Environment.GetEnvironmentVariable("DQ9_DEBUG") == "1")
++            Logger.Sink = new ConsoleLogSink();
++        else
++            builder = builder.LogToTrace();
++
++        return builder;
++    }
++
++    /// <summary>Minimal stderr sink for terminal diagnostics.</summary>
++    private sealed class ConsoleLogSink : ILogSink
++    {
++        public bool IsEnabled(LogEventLevel level, string area) => true;
++
++        public void Log(LogEventLevel level, string area, object? source, string messageTemplate) =>
++            Write(area, source, messageTemplate, Array.Empty<object?>());
++
++        public void Log(LogEventLevel level, string area, object? source, string messageTemplate,
++            params object?[] propertyValues) =>
++            Write(area, source, messageTemplate, propertyValues);
++
++        private static void Write(string area, object? source, string template, object?[] values)
++        {
++            string formatted;
++            try { formatted = string.Format(template, values); }
++            catch (FormatException) { formatted = template; }
++            Console.Error.WriteLine($"[dq9:{area}] {formatted}");
++        }
+     }
+ }
